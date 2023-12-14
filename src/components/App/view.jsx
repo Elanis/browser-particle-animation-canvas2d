@@ -18,12 +18,27 @@ function randomThetaAndRadius() {
 	};
 }
 
-function getCoordinatesFromData(data) {
+const shapeDelta = [
+	{
+		x: 400,
+		y: 150,
+	},
+	{
+		x: 1200,
+		y: 200,
+	},
+	{
+		x: 1000,
+		y: 900,
+	}
+];
+
+function getCoordinatesFromData(data, shapeIndex) {
 	const timeDelta = (Date.now()) / data.radius / 10;
 
 	return {
-		x: Math.round(data.radius * Math.cos(data.theta + timeDelta)),
-		y: Math.round(data.radius * Math.sin(data.theta + timeDelta)),
+		x: Math.round(data.radius * Math.cos(data.theta + timeDelta)) + shapeDelta[shapeIndex].x,
+		y: Math.round(data.radius * Math.sin(data.theta + timeDelta)) + shapeDelta[shapeIndex].y,
 	}
 }
 
@@ -32,7 +47,7 @@ function lerp(a, b, alpha) {
 }
 
 function getColorFromDistanceToCenter(data) {
-	return '#' + Math.round(lerp(0xFF0000, 0x00FF00, data.radius / MAX_RADIUS)).toString(16).padStart('0', 6);
+	return '#' + Math.round(lerp(0xAA0000, 0xAAFFFF, data.radius / MAX_RADIUS)).toString(16).padStart('0', 6);
 }
 
 const randomPoints = (Array(PARTICLE_AMOUNT).fill(1)).map(() => randomThetaAndRadius());
@@ -41,34 +56,29 @@ export default function App() {
 	const windowDimensions = useWindowDimensions();
 	const [delta, setDelta] = useState({ x: 0, y: 0 });
 
-	const elements = randomPoints.map((e, index) => {
-		const coordinates = getCoordinatesFromData(e);
+	const elements = Array(Math.min(parseInt(localStorage.visitors || 1), shapeDelta.length)).fill(0).map((e, shapeIndex) => {
+		return randomPoints.map((e, index) => {
+			const coordinates = getCoordinatesFromData(e, shapeIndex);
 
-		return new Circle({
-			id: index,
-			x: delta.x + coordinates.x,
-			y: delta.y + coordinates.y,
-			radius: 1,
-			fill: getColorFromDistanceToCenter(e),
+			return new Circle({
+				id: index,
+				x: delta.x + coordinates.x,
+				y: delta.y + coordinates.y,
+				radius: 1,
+				fill: getColorFromDistanceToCenter(e),
+			});
 		});
-	});
+	}).flat();
 
 	useEffect(() => {
 		let doIt = true;
-		let prevX = null;
-		let prevY = null;
 		function applyWindowMovement() {
-			if(prevX !== null) {
-				setDelta((currDelta) => {
-					return {
-						x: -window.screenX + 600,
-						y: -window.screenY + 150,
-					};
-				});
-			}
-
-			prevX = window.screenX;
-			prevY = window.screenY;
+			setDelta((currDelta) => {
+				return {
+					x: -window.screenX,
+					y: -window.screenY,
+				};
+			});
 
 			if(doIt) {
 				window.requestAnimationFrame(applyWindowMovement);
@@ -78,6 +88,24 @@ export default function App() {
 		window.requestAnimationFrame(applyWindowMovement);
 
 		return () => { doIt = false; };
+	}, []);
+
+	useEffect(() => {
+		let visitors = parseInt(localStorage.visitors);
+		if(Number.isNaN(visitors)) {
+			visitors = 0;
+		}
+
+		visitors++;
+		localStorage.visitors = visitors;
+
+		function cb() {
+			let visitors = parseInt(localStorage.visitors);
+			visitors--;
+			localStorage.visitors = visitors;
+		}
+
+		window.addEventListener('beforeunload', cb);
 	}, []);
 
 	return (
