@@ -1,0 +1,17 @@
+/**
+ * Global layout
+ */
+html, body, #root {
+	width: 100vw;
+	height: 100vh;
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+	color: #DDDDDD;
+	background: hsl(211deg 11.74% 1.28%);
+	overflow-x: hidden;
+}
+
+* {
+	box-sizing: border-box;
+}
