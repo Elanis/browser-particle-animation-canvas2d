@@ -20,6 +20,7 @@ export default function App() {
 			elements={getCircleList(randomPoints, delta)}
 			width={windowDimensions.width}
 			height={windowDimensions.height}
+			onFrame={() => {}}
 			minZoom={1}
 			maxZoom={1}
 			tileSize={1}
