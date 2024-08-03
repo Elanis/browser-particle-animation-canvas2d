@@ -17,10 +17,9 @@ export default function App() {
 
 	return (
 		<Canvas2D 
-			elements={getCircleList(randomPoints, delta)}
 			width={windowDimensions.width}
 			height={windowDimensions.height}
-			onFrame={() => {}}
+			onFrame={() => getCircleList(randomPoints, delta)}
 			minZoom={1}
 			maxZoom={1}
 			tileSize={1}
