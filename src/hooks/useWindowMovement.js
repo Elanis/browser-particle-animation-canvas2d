@@ -6,7 +6,7 @@ export default function useWindowMovement() {
 	useEffect(() => {
 		let doIt = true;
 		function applyWindowMovement() {
-			setDelta((currDelta) => {
+			setDelta((/*currDelta*/) => {
 				return {
 					x: -window.screenX,
 					y: -window.screenY,
